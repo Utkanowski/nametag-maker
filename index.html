@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nametag Maker</title>
+
+<link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+
+<style>
+    :root {
+        --mc-bg: #1e1e1e;
+        --mc-panel: #313131;
+        --mc-border: #000000;
+        --mc-border-light: #555555;
+        --mc-border-dark: #1a1a1a;
+        --mc-text: #ffffff;
+        --mc-button: #3c3c3c;
+        --mc-button-hover: #4c4c4c;
+        --mc-button-border: #000000;
+        --mc-input-bg: #000000;
+    }
+
+    body {
+        background-color: var(--mc-bg);
+        background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+        margin: 0;
+        padding: 10px;
+        font-family: 'Minecraftia', sans-serif;
+        color: var(--mc-text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 800px;
+        width: 100%;
+        background: var(--mc-panel);
+        border: 4px solid var(--mc-border);
+        box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
+        padding: 20px;
+        position: relative;
+    }
+
+    .container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border: 4px solid var(--mc-border-light);
+        border-right-color: var(--mc-border-dark);
+        border-bottom-color: var(--mc-border-dark);
+        pointer-events: none;
+    }
+
+    h1 {
+        font-size: 22px;
+        text-align: center;
+        margin: 0 0 15px 0;
+        text-shadow: 4px 4px 0 #000;
+        letter-spacing: 2px;
+        color: #ffff55;
+    }
+
+    .section {
+        background: rgba(0,0,0,0.2);
+        border: 2px solid var(--mc-border-dark);
+        padding: 12px;
+        margin-bottom: 15px;
+        box-shadow: inset 4px 4px 0 rgba(0,0,0,0.3);
+    }
+
+    .section-title {
+        font-size: 11px;
+        color: #aaa;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 2px;
+        background: var(--mc-border-dark);
+    }
+
+    .input-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .field {
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .label {
+        font-size: 11px;
+        margin-bottom: 5px;
+        text-shadow: 2px 2px 0 #000;
+    }
+
+    input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 8px;
+        background: var(--mc-input-bg);
+        border: 2px solid var(--mc-border-light);
+        border-top-color: var(--mc-border-dark);
+        border-left-color: var(--mc-border-dark);
+        color: #fff;
+        font-family: 'Minecraftia', monospace;
+        font-size: 13px;
+        box-sizing: border-box;
+    }
+
+    input:focus {
+        outline: 2px solid #ffff55;
+    }
+
+    .radio-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 8px;
+    }
+
+    .radio-item input {
+        display: none;
+    }
+
+    .radio-item label {
+        display: block;
+        padding: 8px;
+        background: var(--mc-button);
+        border: 3px solid var(--mc-button-border);
+        border-top-color: var(--mc-border-light);
+        border-left-color: var(--mc-border-light);
+        text-align: center;
+        cursor: pointer;
+        font-size: 10px;
+        transition: all 0.1s;
+        text-shadow: 2px 2px 0 #000;
+    }
+
+    .radio-item input:checked + label {
+        background: #5555ff;
+        border-color: #0000aa;
+        border-top-color: #000000;
+        border-left-color: #000000;
+        transform: translate(1px, 1px);
+    }
+
+    .color-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    input[type="color"] {
+        width: 100%;
+        height: 35px;
+        background: var(--mc-input-bg);
+        border: 2px solid var(--mc-border-light);
+        cursor: pointer;
+        padding: 2px;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 10px;
+        font-family: 'Minecraftia', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+        border: 4px solid #000;
+        border-top-color: #888;
+        border-left-color: #888;
+        text-shadow: 2px 2px 0 #000;
+        color: #fff;
+        transition: transform 0.1s;
+    }
+
+    .btn:active {
+        transform: translate(2px, 2px);
+        border-top-color: #000;
+        border-left-color: #000;
+    }
+
+    .btn-gen { background: #55ff55; color: #003300; border-top-color: #aaffaa; border-left-color: #aaffaa; text-shadow: none; font-weight: bold; }
+    .btn-gen:hover { background: #77ff77; }
+
+    .btn-dl { background: #5555ff; border-top-color: #aaaaff; border-left-color: #aaaaff; }
+    .btn-dl:hover { background: #7777ff; }
+
+    .preview-area {
+        background: #000;
+        border: 4px solid var(--mc-border-light);
+        padding: 10px;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    canvas {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+        height: auto;
+        image-rendering: pixelated;
+    }
+
+    footer {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 10px;
+        color: #666;
+    }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h1>NAMETAG MAKER</h1>
+
+    <div class="section">
+        <div class="section-title">Player Info</div>
+        <div class="input-row">
+            <div class="field">
+                <div class="label">Username</div>
+                <input type="text" id="nameInput" value="Player">
+            </div>
+            <div class="field">
+                <div class="label">Pop Count</div>
+                <input type="number" id="popInput" value="0" min="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Visual Settings</div>
+        <div class="label">Mode</div>
+        <div class="radio-grid" style="margin-bottom: 20px;">
+            <div class="radio-item">
+                <input type="radio" name="team" id="normal" value="normal" checked>
+                <label for="normal">Normal</label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" name="team" id="friend" value="friend">
+                <label for="friend">Friend</label>
+            </div>
+            <div class="radio-item">
+                <input type="radio" name="team" id="enemy" value="enemy">
+                <label for="enemy">Enemy</label>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="field">
+                <div class="label">Texture Style</div>
+                <div class="radio-grid">
+                    <div class="radio-item">
+                        <input type="radio" name="textureStyle" id="oldStyle" value="old" checked>
+                        <label for="oldStyle">Programmer Art</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="textureStyle" id="newStyle" value="new">
+                        <label for="newStyle">Jappa</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <div class="label">Armor Set</div>
+                <div class="radio-grid">
+                    <div class="radio-item">
+                        <input type="radio" name="armorSet" id="netheriteSet" value="netherite" checked>
+                        <label for="netheriteSet">Netherite</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" name="armorSet" id="diamondSet" value="diamond">
+                        <label for="diamondSet">Diamond</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Colors</div>
+        <div class="color-grid">
+            <div class="field">
+                <div class="label">Friend</div>
+                <input type="color" id="friendColor" value="#00ffff">
+            </div>
+            <div class="field">
+                <div class="label">Enemy</div>
+                <input type="color" id="enemyColor" value="#b40000">
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-gen" onclick="generate()">GENERATE</button>
+        <button class="btn btn-dl" onclick="downloadPNG()">DOWNLOAD PNG</button>
+    </div>
+
+    <div class="preview-area">
+        <canvas id="canvas" width="750" height="250"></canvas>
+    </div>
+
+    <footer>
+        by Utkanowski
+    </footer>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+ctx.imageSmoothingEnabled = false;
+
+const OLD_ROOT = "https://assets.mcasset.cloud/1.12.2/assets/minecraft/textures/items/";
+const NEW_ROOT = "https://assets.mcasset.cloud/1.21.1/assets/minecraft/textures/item/";
+
+const loaded={};
+
+function getSettings() {
+    return {
+        style: document.querySelector('input[name="textureStyle"]:checked').value,
+        armor: document.querySelector('input[name="armorSet"]:checked').value
+    };
+}
+
+function loadImages(callback){
+    const s = getSettings();
+    const isOld = s.style === 'old';
+    const itemRoot = isOld ? OLD_ROOT : NEW_ROOT;
+    const totemFile = isOld ? 'totem.png' : 'totem_of_undying.png';
+    const armorRoot = (s.armor === 'netherite') ? NEW_ROOT : itemRoot;
+
+    const icons = {
+        totem: `${itemRoot}${totemFile}`,
+        crystal: `${itemRoot}end_crystal.png`,
+        helmet: `${armorRoot}${s.armor}_helmet.png`,
+        chest: `${armorRoot}${s.armor}_chestplate.png`,
+        legs: `${armorRoot}${s.armor}_leggings.png`,
+        boots: `${armorRoot}${s.armor}_boots.png`
+    };
+
+    let count=0;
+    const keys=Object.keys(icons);
+    keys.forEach(k => delete loaded[k]);
+
+    keys.forEach(k=>{
+        const img=new Image();
+        img.crossOrigin="anonymous";
+        img.src=icons[k];
+        img.onload=()=>{
+            loaded[k]=img;
+            count++;
+            if(count===keys.length) callback();
+        };
+        img.onerror = () => {
+            count++;
+            if(count===keys.length) callback();
+        };
+    });
+}
+
+function getTeamColor() {
+    if (document.getElementById('friend').checked) return document.getElementById('friendColor').value;
+    if (document.getElementById('enemy').checked) return document.getElementById('enemyColor').value;
+    return '#ffffff';
+}
+
+function getPopColor(pop) {
+    if (pop <= 0) return null;
+    const colors = { 1: "#ffff55", 2: "#ffaa00", 3: "#ff5500", 4: "#ff2200", 5: "#aa0000" };
+    return colors[Math.min(pop, 5)];
+}
+
+function generate(){
+    setTimeout(() => {
+        loadImages(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const name = document.getElementById("nameInput").value || "Player";
+            const popCount = parseInt(document.getElementById("popInput").value) || 0;
+            const teamColor = getTeamColor();
+            const centerX = canvas.width / 2;
+            
+            const itemSize = 100;
+            const gap = 4;
+            const totalItems = 6;
+            const totalWidth = (itemSize * totalItems) + (gap * (totalItems - 1));
+            const startX = centerX - totalWidth / 2;
+            const itemY = 40; 
+            const nameY = itemY + itemSize + 48;
+
+            const drawOrder = ['crystal', 'helmet', 'chest', 'legs', 'boots', 'totem'];
+            drawOrder.forEach((key, index) => {
+                if (loaded[key]) {
+                    const x = startX + (index * (itemSize + gap));
+                    ctx.imageSmoothingEnabled = false;
+                    ctx.drawImage(loaded[key], x, itemY, itemSize, itemSize);
+
+                    if (key === 'crystal') {
+                        ctx.font = "40px 'Minecraftia', monospace";
+                        ctx.textAlign = "right";
+                        ctx.textBaseline = "bottom";
+                        const offsetX = 8;
+                        const offsetY = 8;
+                        ctx.fillStyle = "rgba(0,0,0,0.8)";
+                        ctx.fillText("64", x + itemSize + offsetX + 2, itemY + itemSize + offsetY + 2);
+                        ctx.fillStyle = "white";
+                        ctx.fillText("64", x + itemSize + offsetX, itemY + itemSize + offsetY);
+                    }
+                }
+            });
+
+            ctx.font = "47px 'Minecraftia', monospace";
+            ctx.textBaseline = "middle";
+            const popText = popCount > 0 ? ` -${popCount}` : "";
+            const fullTextWidth = ctx.measureText(name + popText).width;
+            const textStartX = centerX - fullTextWidth / 2;
+
+            ctx.textAlign = "left";
+            ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+            ctx.fillText(name, textStartX + 2, nameY + 2);
+            ctx.fillStyle = teamColor;
+            ctx.fillText(name, textStartX, nameY);
+
+            if (popCount > 0) {
+                const nameWidth = ctx.measureText(name).width;
+                const popX = textStartX + nameWidth - 4; 
+                const popColor = getPopColor(popCount);
+                ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+                ctx.fillText(popText, popX + 2, nameY + 2);
+                ctx.fillStyle = popColor;
+                ctx.fillText(popText, popX, nameY);
+            }
+        });
+    }, 200);
+}
+
+function downloadPNG(){
+    const link=document.createElement("a");
+    link.download="nametag.png";
+    link.href=canvas.toDataURL("image/png");
+    link.click();
+}
+</script>
+</body>
+</html>
